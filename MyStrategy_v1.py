@@ -44,8 +44,8 @@ class MyStrategy:
 		Opponent = world.get_opponent_player()
 		Teammate = world.get_my_player()
 
-		halfY = 460.0    #0.5 * (Opponent.net_bottom + Opponent.net_top)
-		halfX = 600.0   #0.5 * (Opponent.net_back + Teammate.net_back)
+		halfY = 0.5 * (Opponent.net_bottom + Opponent.net_top)
+		halfX = 0.5 * (Opponent.net_back + Teammate.net_back)
 
 		if self.tick_pass != 0:
 			if self.tick_pass > 50:
@@ -59,11 +59,6 @@ class MyStrategy:
 		# self.log("{X}:{Y} \n".format(X=halfX, Y=halfY))
 
 		speed_of_puck = (world.puck.speed_x ** 2 + world.puck.speed_y ** 2) ** 0.5
-		# self.log("{speed}\n".format(speed=speed_of_puck))
-		# self.p = world.get_my_player().goal_count
-		# if self.p > self.pr:
-		# 	self.pr = self.p
-		# 	self.log("GOAL!\n")
 
 		if me.state == HockeyistState.SWINGING:
 			c = {}
@@ -100,10 +95,6 @@ class MyStrategy:
 				move.speed_up = a['speedUp']
 				teammate = self.get_second_teammate(me.id, me.player_id, world)
 
-
-				#if (self.opponent_close(world, me, 3.5) and
-				#		me.get_distance_to_unit(teammate) > world.width / 3	and
-				#		abs(dist_from_net_to_me) < red_line):
 				if abs(dist_from_net_to_me) < red_line:
 					angle_to_teammate = me.get_angle_to_unit(self.get_second_teammate(me.id, me.player_id, world))
 					move.turn = angle_to_teammate
@@ -116,14 +107,8 @@ class MyStrategy:
 					angle_to_a = me.get_angle_to(a['x'], a['y'])
 					move.turn = angle_to_a
 				elif abs(angle_to_net) < STRIKE_ANGLE and abs(dist_from_net_to_me) <= line_of_attack:
-					# if self.high_speed:
-					# self.log("Speed of puck={speed}\n".format(speed=speed_of_puck))
 					move.action = ActionType.SWING
 					move.speed_up = a['speedUp']
-					# else:
-					# 	move.action = ActionType.SWING
-					# 	self.log("Enter on swing, speed={speed}\n".format(speed=speed_of_puck))
-					# self.back_flag = False
 			else:
 				# logic of defender
 				if world.tick >= game.overtime_tick_count:
@@ -225,30 +210,10 @@ class MyStrategy:
 			a['x'] = halfX
 			a['y'] = halfY + world.height * (-1 if bestHalfGorizont == UP_HALF_BEST else 1) / 2 + 5.5 * me.radius *(1 if bestHalfGorizont == UP_HALF_BEST else -1)
 			a['speedUp'] = MAX_SPEED_UP
-		# elif net_on_the_left and me.x > halfX - world.width / 10 or net_on_the_left == False and me.x < halfX + world.width / 10:
-		# 	a['x'] = halfX - world.width / 10 if net_on_the_left else halfX + world.width / 10
-		# 	a['y'] = halfY + world.height * (-1 if me.y < halfY else 1) / 2 + 6 * me.radius *(1 if me.y < halfY else -1)
-		# 	a['speedUp'] = MAX_SPEED_UP / 2
 		else:
 			a['x'] = net_x
 			a['y'] = net_y
 			a['speedUp'] = MAX_SPEED_UP / 3
-
-		# coef_of_width = 3.0
-		# coef_of_height = 10.0
-		# coef_of_area = 1.5
-		#
-		# a['x'] = world.width / coef_of_width if net_on_the_left else net_x - world.width / coef_of_width
-		# if me.y > world.height / 2:
-		# 	if bestHalfGorizont == UP_HALF_BEST and abs(net_x - me.x) >= world.width / coef_of_area:
-		# 		a['y'] = opponent.net_top - world.height / coef_of_height
-		# 	else:
-		# 		a['y'] = opponent.net_bottom + world.height / coef_of_height
-		# else:
-		# 	if bestHalfGorizont == DOWN_HALF_BEST and abs(net_x - me.x) >= world.width / coef_of_area:
-		# 		a['y'] = opponent.net_bottom + world.height / coef_of_height
-		# 	else:
-		# 		a['y'] = opponent.net_top - world.height / coef_of_height
 
 		return None
 
